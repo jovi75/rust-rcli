@@ -1,1 +1,1 @@
-# rust-rcli
+# a Rust Cli app
