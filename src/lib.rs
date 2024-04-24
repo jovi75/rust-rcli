@@ -1,5 +1,5 @@
-pub mod opts;
+pub mod cli;
 pub mod process;
 
-pub use opts::{Opts, SubCommand};
-pub use process::{process_csv, process_genpass};
+pub use cli::{Base64SubCommand, Opts, SubCommand};
+pub use process::*;

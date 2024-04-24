@@ -1,8 +1,9 @@
 // cli csv -i input.csv -o output.json --header -d ','
 
 use clap::Parser;
-use cli::opts::{Opts, SubCommand};
-use cli::process::{process_csv, process_genpass};
+use cli::cli::base64::Base64SubCommand;
+use cli::cli::{Opts, SubCommand};
+use cli::process::{process_csv, process_decode, process_encode, process_genpass};
 
 fn main() -> anyhow::Result<()> {
     let opt = Opts::parse();
@@ -23,8 +24,15 @@ fn main() -> anyhow::Result<()> {
                 opts.number,
                 opts.symbol,
             )?;
-            // println!("{:?}", opts);
         }
+        SubCommand::Base64(subcmd) => match subcmd {
+            Base64SubCommand::Encode(opts) => {
+                process_encode(&opts.input, opts.format)?;
+            }
+            Base64SubCommand::Decode(opts) => {
+                process_decode(&opts.input, opts.format)?;
+            }
+        },
     }
 
     Ok(())
