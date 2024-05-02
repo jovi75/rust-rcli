@@ -1,6 +1,7 @@
 use super::*;
 use anyhow::{anyhow, Error};
 use clap::Parser;
+use core::str;
 use std::fmt;
 use std::path::PathBuf;
 use std::str::FromStr;
@@ -13,8 +14,31 @@ pub enum TextSubCommand {
     Verify(TextVerifyOpts),
     #[command(about = "Generate key")]
     Generate(TextKeyGenerateOpts),
+    #[command(about = "Encrypt text")]
+    Encrypt(TextEncryptOpts),
+    #[command(about = "Decrypt text")]
+    Decrypt(TextDecryptOpts),
 }
 
+// rcli text encrypt -key"xxx"> 加密并输出 base64
+#[derive(Debug, Parser)]
+pub struct TextEncryptOpts {
+    #[arg(short, long, value_parser = verify_file, default_value = "-")]
+    pub input: String,
+    #[arg(short, long)]
+    pub key: String,
+}
+
+// rcli text decrypt -key"XXX" > base64 > binary> 解密文本
+#[derive(Debug, Parser)]
+pub struct TextDecryptOpts {
+    #[arg(short, long, value_parser = verify_file, default_value = "-")]
+    pub input: String,
+    #[arg(short, long)]
+    pub key: String,
+}
+
+// rcli text sign --key key --input input --format blake3
 #[derive(Debug, Parser)]
 pub struct TextSignOpts {
     #[arg(short, long, value_parser = verify_file, default_value = "-")]
@@ -25,6 +49,7 @@ pub struct TextSignOpts {
     pub format: TextSignFormat,
 }
 
+// rcli text verify --key key --input input --format blake3 --sig sig
 #[derive(Debug, Parser)]
 pub struct TextVerifyOpts {
     #[arg(short, long, value_parser = verify_file, default_value = "-")]
@@ -37,6 +62,7 @@ pub struct TextVerifyOpts {
     pub sig: String,
 }
 
+// rcli text generate --format blake3 --output path
 #[derive(Debug, Parser)]
 pub struct TextKeyGenerateOpts {
     #[arg(short, long, default_value="blake3", value_parser = parse_format)]

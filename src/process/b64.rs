@@ -9,7 +9,6 @@ use std::io::Read;
 
 pub fn process_encode(input: &str, format: Base64Format) -> Result<String> {
     let mut reader = utils::get_reader(input)?;
-
     let mut data = Vec::new();
     reader.read_to_end(&mut data)?;
 
@@ -22,7 +21,6 @@ pub fn process_encode(input: &str, format: Base64Format) -> Result<String> {
 
 pub fn process_decode(input: &str, format: Base64Format) -> Result<Vec<u8>> {
     let mut reader = utils::get_reader(input)?;
-
     let mut data = String::new();
     reader.read_to_string(&mut data)?;
     let data = data.trim();

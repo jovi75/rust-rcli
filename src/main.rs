@@ -7,7 +7,10 @@ use zxcvbn::zxcvbn;
 
 use cli::cli::base64::Base64SubCommand;
 use cli::cli::{Opts, SubCommand};
-use cli::process::{process_csv, process_decode, process_encode, process_genpass, process_sign};
+use cli::process::{
+    process_csv, process_decode, process_decrypt, process_encode, process_encrypt, process_genpass,
+    process_sign,
+};
 use cli::{process_gen_key, process_verify, TextSignFormat, TextSubCommand};
 
 fn main() -> anyhow::Result<()> {
@@ -71,9 +74,16 @@ fn main() -> anyhow::Result<()> {
                         println!("verifying key saved in {:?}", pk);
                     }
                 }
-                //todo
-                // cli text encrypt -key "xxx" ==> 加密输出 encode base64
-                // cli text decrypt -key "xxx" ==> base64 decode binary - 解密输出
+            }
+            TextSubCommand::Encrypt(opts) => {
+                println!("{:?}", opts);
+                let result = process_encrypt(&opts.input, &opts.key)?;
+                println!("{}", result);
+            }
+            TextSubCommand::Decrypt(opts) => {
+                println!("{:?}", opts);
+                let result = process_decrypt(&opts.input, &opts.key)?;
+                println!("{}", result);
             }
         },
     }
