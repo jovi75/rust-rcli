@@ -3,18 +3,21 @@
 use std::fs;
 
 use clap::Parser;
+use cli::{
+    cli::{base64::Base64SubCommand, http::HttpSubCommand, Opts, SubCommand},
+    process::{
+        process_csv, process_decode, process_decrypt, process_encode, process_encrypt,
+        process_genpass, process_sign,
+    },
+    process_gen_key, process_http, process_verify, TextSignFormat, TextSubCommand,
+};
 use zxcvbn::zxcvbn;
 
-use cli::cli::base64::Base64SubCommand;
-use cli::cli::{Opts, SubCommand};
-use cli::process::{
-    process_csv, process_decode, process_decrypt, process_encode, process_encrypt, process_genpass,
-    process_sign,
-};
-use cli::{process_gen_key, process_verify, TextSignFormat, TextSubCommand};
-
-fn main() -> anyhow::Result<()> {
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
     let opt = Opts::parse();
+    tracing_subscriber::fmt::init();
+
     match opt.cmd {
         SubCommand::Csv(opts) => {
             let output = if let Some(output) = opts.output {
@@ -84,6 +87,11 @@ fn main() -> anyhow::Result<()> {
                 println!("{:?}", opts);
                 let result = process_decrypt(&opts.input, &opts.key)?;
                 println!("{}", result);
+            }
+        },
+        SubCommand::Http(cmd) => match cmd {
+            HttpSubCommand::Serve(opts) => {
+                process_http(opts.dir, opts.port).await?;
             }
         },
     }
