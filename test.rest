@@ -2,4 +2,4 @@
 GET http://127.0.0.1:8080/Cargo.toml
 
 ### test dir
-GET http://127.0.0.1:8080/fixture/ed25519.pk
+GET http://127.0.0.1:8080/tower/fixture/blake3.txt

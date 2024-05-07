@@ -10,6 +10,7 @@ use std::str::FromStr;
 use tokio::fs;
 
 #[derive(Debug, Parser)]
+#[enum_dispatch(CmdExecutor)]
 pub enum TextSubCommand {
     #[command(about = "Sign text")]
     Sign(TextSignOpts),
@@ -167,14 +168,14 @@ impl CmdExecutor for TextDecryptOpts {
     }
 }
 
-impl CmdExecutor for TextSubCommand {
-    async fn execute(self) -> Result<()> {
-        match self {
-            TextSubCommand::Sign(opts) => opts.execute().await,
-            TextSubCommand::Verify(opts) => opts.execute().await,
-            TextSubCommand::Generate(opts) => opts.execute().await,
-            TextSubCommand::Encrypt(opts) => opts.execute().await,
-            TextSubCommand::Decrypt(opts) => opts.execute().await,
-        }
-    }
-}
+// impl CmdExecutor for TextSubCommand {
+//     async fn execute(self) -> Result<()> {
+//         match self {
+//             TextSubCommand::Sign(opts) => opts.execute().await,
+//             TextSubCommand::Verify(opts) => opts.execute().await,
+//             TextSubCommand::Generate(opts) => opts.execute().await,
+//             TextSubCommand::Encrypt(opts) => opts.execute().await,
+//             TextSubCommand::Decrypt(opts) => opts.execute().await,
+//         }
+//     }
+// }

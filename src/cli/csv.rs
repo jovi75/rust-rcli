@@ -1,6 +1,6 @@
+use super::verify_file;
 use crate::{process_csv, CmdExecutor};
 
-use super::verify_file;
 use clap::Parser;
 use std::fmt::Display;
 use std::str::FromStr;
