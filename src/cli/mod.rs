@@ -1,3 +1,5 @@
+use crate::CmdExecutor;
+
 pub use self::{
     base64::{Base64Format, Base64SubCommand},
     csv::{CsvOpts, OutputFormat},
@@ -34,6 +36,18 @@ pub enum SubCommand {
     Text(text::TextSubCommand),
     #[command(subcommand)]
     Http(http::HttpSubCommand),
+}
+
+impl CmdExecutor for SubCommand {
+    async fn execute(self) -> Result<()> {
+        match self {
+            SubCommand::Csv(opts) => opts.execute().await,
+            SubCommand::GenPass(opts) => opts.execute().await,
+            SubCommand::Base64(cmd) => cmd.execute().await,
+            SubCommand::Text(cmd) => cmd.execute().await,
+            SubCommand::Http(cmd) => cmd.execute().await,
+        }
+    }
 }
 
 fn verify_file(filename: &str) -> Result<String, &'static str> {
