@@ -3,6 +3,7 @@ pub use self::{
     csv::*,
     genpass::GenPassOpts,
     http::HttpSubCommand,
+    jwt::*,
     text::{TextSignFormat, TextSubCommand},
 };
 use crate::CmdExecutor;
@@ -16,6 +17,7 @@ pub mod base64;
 pub mod csv;
 pub mod genpass;
 pub mod http;
+pub mod jwt;
 pub mod text;
 
 #[derive(Debug, Parser)]
@@ -38,19 +40,9 @@ pub enum SubCommand {
     Text(text::TextSubCommand),
     #[command(subcommand)]
     Http(http::HttpSubCommand),
+    #[command(subcommand)]
+    Jwt(jwt::JwtSubCommand),
 }
-
-// impl CmdExecutor for SubCommand {
-//     async fn execute(self) -> Result<()> {
-//         match self {
-//             SubCommand::Csv(opts) => opts.execute().await,
-//             SubCommand::GenPass(opts) => opts.execute().await,
-//             SubCommand::Base64(cmd) => cmd.execute().await,
-//             SubCommand::Text(cmd) => cmd.execute().await,
-//             SubCommand::Http(cmd) => cmd.execute().await,
-//         }
-//     }
-// }
 
 fn verify_file(filename: &str) -> Result<String, &'static str> {
     // if input is "-" or file exists

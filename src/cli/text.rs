@@ -167,15 +167,3 @@ impl CmdExecutor for TextDecryptOpts {
         Ok(())
     }
 }
-
-// impl CmdExecutor for TextSubCommand {
-//     async fn execute(self) -> Result<()> {
-//         match self {
-//             TextSubCommand::Sign(opts) => opts.execute().await,
-//             TextSubCommand::Verify(opts) => opts.execute().await,
-//             TextSubCommand::Generate(opts) => opts.execute().await,
-//             TextSubCommand::Encrypt(opts) => opts.execute().await,
-//             TextSubCommand::Decrypt(opts) => opts.execute().await,
-//         }
-//     }
-// }

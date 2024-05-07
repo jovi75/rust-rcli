@@ -33,15 +33,6 @@ impl CmdExecutor for Base64DecodeOpts {
     }
 }
 
-// impl CmdExecutor for Base64SubCommand {
-//     async fn execute(self) -> Result<()> {
-//         match self {
-//             Base64SubCommand::Encode(opts) => opts.execute().await,
-//             Base64SubCommand::Decode(opts) => opts.execute().await,
-//         }
-//     }
-// }
-
 #[derive(Debug, Parser)]
 #[command(name = "encode", about = "Encodes a string to Base64")]
 pub struct Base64EncodeOpts {
