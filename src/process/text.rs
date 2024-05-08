@@ -124,27 +124,32 @@ impl KeyLoader for Ed25519Verifier {
 // }
 
 pub struct Chacha {
-    key: String,
+    key: [u8; 32],
     nonce: chacha20poly1305::Nonce,
 }
 
 impl Chacha {
-    pub fn new(k: &str) -> Self {
+    pub fn new(k: [u8; 32]) -> Self {
         Self {
-            key: String::from(k),
-            nonce: *GenericArray::from_slice(&k.as_bytes()[..12]),
+            key: k,
+            nonce: *GenericArray::from_slice(&k[..12]),
         }
     }
 
+    pub fn try_new(k: &str) -> Result<Self> {
+        let key = k.as_bytes().try_into()?;
+        Ok(Self::new(key))
+    }
+
     fn encrypt(&self, input: impl AsRef<[u8]>) -> Result<String> {
-        let cipher = ChaCha20Poly1305::new_from_slice(self.key.as_bytes())?;
+        let cipher = ChaCha20Poly1305::new_from_slice(&self.key)?;
         let result = cipher.encrypt(&self.nonce, input.as_ref()).unwrap();
         Ok(URL_SAFE_NO_PAD.encode(result))
     }
 
     fn decrypt(&self, input: impl AsRef<[u8]>) -> Result<String> {
         let input = URL_SAFE_NO_PAD.decode(input)?;
-        let cipher = ChaCha20Poly1305::new_from_slice(self.key.as_bytes())?;
+        let cipher = ChaCha20Poly1305::new_from_slice(&self.key)?;
         let result = cipher.decrypt(&self.nonce, input.as_ref()).unwrap();
         Ok(String::from_utf8(result).unwrap())
     }
@@ -155,7 +160,7 @@ pub fn process_encrypt(input: &str, key: &str) -> Result<String> {
     let mut data = Vec::new();
     reader.read_to_end(&mut data)?;
 
-    let chacha = Chacha::new(key);
+    let chacha = Chacha::try_new(key)?;
     let entrypted = chacha.encrypt(&data)?;
     Ok(entrypted)
 }
@@ -166,7 +171,7 @@ pub fn process_decrypt(input: &str, key: &str) -> Result<String> {
     reader.read_to_string(&mut data)?;
     let data = data.trim();
 
-    let chacha = Chacha::new(key);
+    let chacha = Chacha::try_new(key)?;
     let result = chacha.decrypt(data.as_bytes())?;
     Ok(result)
 }
@@ -279,7 +284,7 @@ mod tests {
         let k = "Wa4fY3nwH%frPnF8_G*JBK54a_*mwW&g";
         let text = "hello!";
 
-        let chacha = Chacha::new(k);
+        let chacha = Chacha::try_new(k)?;
         let encrypted = chacha.encrypt(text)?;
         println!("{}", encrypted);
         let decrypted = chacha.decrypt(encrypted)?;
