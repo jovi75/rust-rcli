@@ -71,14 +71,12 @@ impl JwtHS256 {
 pub fn process_jwt_sign(sub: &str, aud: &str, exp: &str, iss: &str) -> Result<String> {
     let my_claims = JwtClaims::new(sub, aud, exp, iss);
     let jwt = JwtHS256::new(SECRET);
-    let token = jwt.sign(&my_claims)?;
-    Ok(token)
+    jwt.sign(&my_claims)
 }
 
 pub fn process_jwt_verify(token: &str) -> Result<JwtClaims> {
     let jwt = JwtHS256::new(SECRET);
-    let claims = jwt.verify(token)?;
-    Ok(claims)
+    jwt.verify(token)
 }
 
 fn parse_human_duration(text: &str) -> Result<Duration> {
