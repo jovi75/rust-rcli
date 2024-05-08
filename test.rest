@@ -1,5 +1,14 @@
-### test index
-GET http://127.0.0.1:8080/Cargo.toml
+### get file
+GET http://127.0.0.1:8080/cargo.toml
 
 ### test dir
+GET http://127.0.0.1:8080/fixture
+
+### ServeDir
+GET http://127.0.0.1:8080/tower/cargo.toml
+
+### test file
 GET http://127.0.0.1:8080/tower/fixture/blake3.txt
+
+###
+GET http://127.0.0.1:8080/tower/fixture/index.html
