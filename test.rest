@@ -1,7 +1,13 @@
 ### get file
 GET http://127.0.0.1:8080/cargo.toml
 
+###
+GET http://127.0.0.1:8080/noexist
+
 ### test dir
+GET http://127.0.0.1:8080
+
+###
 GET http://127.0.0.1:8080/fixture
 
 ### ServeDir
