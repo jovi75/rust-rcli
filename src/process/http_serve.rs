@@ -34,24 +34,7 @@ async fn root_handler(
     State(state): State<Arc<HttpServeState>>,
 ) -> Result<Response<String>, (StatusCode, String)> {
     let content = read_dir(&state.path).await;
-
-    match content {
-        Ok(content) => {
-            let response = Response::builder()
-                .status(StatusCode::OK)
-                .header(CONTENT_TYPE, "text/html")
-                .body(content)
-                .unwrap();
-            Ok(response)
-        }
-        Err(e) => {
-            warn!("reading error:{:?}", e);
-            Err((
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Error reading".to_string(),
-            ))
-        }
-    }
+    make_response(content, true)
 }
 
 async fn get_handler(
@@ -65,31 +48,14 @@ async fn get_handler(
         return Err((StatusCode::NOT_FOUND, format!("file {:?} not found", p)));
     }
 
-    let content: Result<String>;
-    let mut response = Response::builder();
     if p.is_dir() {
-        response = response.header(CONTENT_TYPE, "text/html");
-        content = read_dir(&p).await;
-    } else {
-        info!("reading file {:?}", p);
-        response = response.header(CONTENT_TYPE, "text/plain");
-        content = tokio::fs::read_to_string(p).await.map_err(|e| anyhow!(e));
+        let content = read_dir(&p).await;
+        return make_response(content, true);
     }
 
-    match content {
-        Ok(content) => {
-            info!("content length {} bytes", content.len());
-            let s = response.status(StatusCode::OK).body(content).unwrap();
-            Ok(s)
-        }
-        Err(e) => {
-            warn!("reading error:{:?}", e);
-            Err((
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Error reading".to_string(),
-            ))
-        }
-    }
+    info!("reading file {:?}", p);
+    let content = tokio::fs::read_to_string(p).await.map_err(|e| anyhow!(e));
+    make_response(content, false)
 }
 
 async fn read_dir(p: &PathBuf) -> Result<String> {
@@ -114,5 +80,32 @@ async fn read_dir(p: &PathBuf) -> Result<String> {
             Ok(format!("<html><body>\n{}</body></html>", content))
         }
         Err(e) => Err(e.into()),
+    }
+}
+
+fn make_response(
+    content: Result<String>,
+    is_dir: bool,
+) -> Result<Response<String>, (StatusCode, String)> {
+    match content {
+        Ok(content) => {
+            info!("content length {} bytes", content.len());
+            let response = Response::builder()
+                .status(StatusCode::OK)
+                .header(
+                    CONTENT_TYPE,
+                    if is_dir { "text/html" } else { "text/plain" },
+                )
+                .body(content)
+                .unwrap();
+            Ok(response)
+        }
+        Err(e) => {
+            warn!("reading error:{:?}", e);
+            Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Error reading".to_string(),
+            ))
+        }
     }
 }
